@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ucents – Budget & Expenses</title>
+  <meta name="description" content="Track your net worth, assets, liabilities and cash flow with ease. Smart financial dashboard." />
+  <meta property="og:title" content="Ucents – Budget & Expenses" />
+  <meta property="og:description" content="Understand your finances at a glance. Track net worth, liquidity, and investments." />
+  <meta property="og:url" content="https://appstorch.github.io/ucents-budget/" />
+  <meta property="og:type" content="website" />
+  <link rel="canonical" href="https://appstorch.github.io/ucents-budget/" />
+
+  <style>
+    /* RESET & BASE */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+      overflow-y: scroll;
+      height: 100vh;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: #1a1a1a;
+      background: #fff;
+    }
+    a { text-decoration: none; }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      width: 100%;
+    }
+
+    /* SNAP PAGES */
+    .page {
+      height: 100vh;
+      min-height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 0;
+      overflow-y: auto;
+      position: relative;
+      width: 100%;
+    }
+    .page-content {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* PAGE 1: ORANGE */
+    .page-hero {
+      background: #FF6B00;
+      color: #fff;
+    }
+    .page-hero .lang-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 20;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .page-hero .lang-toggle button {
+      background: rgba(255,255,255,0.15);
+      border: 2px solid transparent;
+      border-radius: 30px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+    }
+    .page-hero .lang-toggle button:hover {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-2px);
+    }
+    .page-hero .lang-toggle button.active {
+      background: rgba(255,255,255,0.3);
+      border-color: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .page-hero .lang-toggle .emoji-flag {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* HERO */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px 0 30px;
+      width: 100%;
+    }
+    .hero-content {
+      max-width: 720px;
+      width: 100%;
+    }
+    .hero h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -0.03em;
+    }
+    .hero h1 .highlight {
+      background: rgba(0,0,0,0.2);
+      padding: 0 16px;
+      border-radius: 16px;
+      display: inline-block;
+    }
+    .hero .subtitle {
+      font-size: 1.3rem;
+      font-weight: 400;
+      opacity: 0.92;
+      margin-bottom: 32px;
+      line-height: 1.7;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .btn-appstore {
+      display: inline-flex;
+      align-items: center;
+      background: #000;
+      color: #fff;
+      padding: 16px 40px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      border: none;
+      cursor: pointer;
+      gap: 12px;
+    }
+    .btn-appstore:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+    }
+    .btn-appstore:active { transform: scale(0.96); }
+    .btn-appstore svg {
+      width: 30px;
+      height: 30px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+    .btn-appstore span {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      line-height: 1.2;
+    }
+    .btn-appstore .small {
+      font-size: 0.6rem;
+      font-weight: 400;
+      opacity: 0.8;
+      letter-spacing: 0.5px;
+    }
+    .btn-appstore .big {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    /* MOCKUP – FINANCIAL THEME */
+    .mockup-wrapper {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    .mockup-iphone {
+      max-width: 260px;
+      width: 100%;
+      border-radius: 40px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.3);
+      background: #1c1c1e;
+      padding: 12px;
+      aspect-ratio: 9 / 19;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+    .mockup-iphone:hover {
+      transform: translateY(-8px) scale(1.02);
+    }
+    .mockup-iphone .screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 30px;
+      background: linear-gradient(145deg, #2c2c2e, #1c1c1e);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .mockup-iphone .screen::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .mockup-iphone .screen .app-icon-placeholder {
+      font-size: 56px;
+      margin-bottom: 4px;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.3));
+    }
+    .mockup-iphone .screen .app-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .mockup-iphone .screen .app-sub {
+      font-size: 0.7rem;
+      opacity: 0.5;
+      font-weight: 400;
+    }
+    .mockup-iphone .notch {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 28px;
+      background: #000;
+      border-radius: 0 0 16px 16px;
+      z-index: 10;
+    }
+    .mockup-iphone .financial-badge {
+      margin-top: 8px;
+      background: #FF6B00;
+      padding: 4px 16px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .scroll-hint {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.5);
+      font-size: 0.85rem;
+      animation: bounce 2s infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .scroll-hint .arrow { font-size: 1.4rem; }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    /* PAGE 2: FEATURES (WHITE) */
+    .page-features {
+      background: #fff;
+      color: #1a1a1a;
+    }
+    .page-features .features {
+      width: 100%;
+      padding: 20px 0;
+    }
+    .page-features .features h2 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .page-features .features .section-desc {
+      text-align: center;
+      font-size: 1.1rem;
+      opacity: 0.7;
+      max-width: 600px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 32px;
+    }
+    .feature-card {
+      background: #f5f5f7;
+      padding: 32px 24px;
+      border-radius: 28px;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+      border: 1px solid #e5e5ea;
+    }
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+      border-color: #d1d1d6;
+    }
+    .feature-card .icon {
+      font-size: 2.6rem;
+      margin-bottom: 16px;
+      display: block;
+      opacity: 0.8;
+    }
+    .feature-card .icon svg {
+      width: 48px;
+      height: 48px;
+      fill: none;
+      stroke: #1a1a1a;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .feature-card h3 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+    .feature-card p {
+      font-size: 0.95rem;
+      opacity: 0.7;
+      line-height: 1.6;
+    }
+
+    /* PAGE 3: DESCRIPTION (WHITE) */
+    .page-description {
+      background: #fff;
+      color: #1a1a1a;
+    }
+    .page-description .description-section {
+      width: 100%;
+      max-width: 900px;
+      padding: 20px 0;
+    }
+    .page-description .description-section .desc-text {
+      font-size: 1.2rem;
+      line-height: 1.9;
+      opacity: 0.9;
+      text-align: left;
+    }
+    .page-description .description-section .desc-text strong {
+      opacity: 1;
+      font-weight: 700;
+    }
+
+    /* PAGE 4: SCREENSHOTS (ORANGE-TINT BG) */
+    .page-screenshots {
+      background: #FFEBDD;
+      color: #1a1a1a;
+    }
+    .page-screenshots .screenshots-section {
+      width: 100%;
+      padding: 20px 0;
+    }
+    .page-screenshots .screenshots-section h2 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .page-screenshots .screenshots-section .section-desc {
+      text-align: center;
+      font-size: 1.1rem;
+      opacity: 0.7;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .screenshots-row {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 12px 4px 20px;
+      justify-content: center;
+      scroll-snap-type: x mandatory;
+    }
+    .screenshots-row .shot {
+      flex: 0 0 auto;
+      width: 160px;
+      border-radius: 24px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+      background: #fff;
+      padding: 8px;
+      transition: transform 0.2s;
+      scroll-snap-align: start;
+    }
+    .screenshots-row .shot:hover {
+      transform: scale(1.02);
+    }
+    .screenshots-row .shot img {
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      display: block;
+      background: #f0f0f0;
+    }
+    /* fallback if images missing */
+    .screenshots-row .shot .placeholder {
+      aspect-ratio: 9 / 19;
+      background: #d0d0d0;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    /* PAGE 5: FAQ (WHITE) */
+    .page-faq {
+      background: #fff;
+      color: #1a1a1a;
+    }
+    .page-faq .faq-section {
+      width: 100%;
+      max-width: 900px;
+      padding: 20px 0;
+    }
+    .page-faq .faq-section h2 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 40px;
+      letter-spacing: -0.02em;
+    }
+    .faq-item {
+      border-bottom: 1px solid #e5e5ea;
+      padding: 24px 0;
+    }
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+    .faq-item .q {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+      color: #1a1a1a;
+    }
+    .faq-item .a {
+      font-size: 1rem;
+      line-height: 1.7;
+      opacity: 0.8;
+      color: #1a1a1a;
+    }
+
+    /* PAGE 6: CTA + FOOTER */
+    .page-cta {
+      background: #FF6B00;
+      color: #fff;
+      justify-content: center;
+    }
+    .page-cta .cta-section {
+      text-align: center;
+      padding: 40px 0;
+    }
+    .page-cta .cta-section h2 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .page-cta .cta-section .sub {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 500px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+    .page-cta footer {
+      width: 100%;
+      background: #000;
+      padding: 32px 20px 28px;
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+    .page-cta footer .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .page-cta footer .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 32px;
+    }
+    .page-cta footer .footer-links a {
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #fff;
+      opacity: 0.7;
+      transition: all 0.2s ease;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 2px;
+    }
+    .page-cta footer .footer-links a:hover {
+      opacity: 1;
+      border-bottom-color: #fff;
+    }
+    .page-cta footer .support-email {
+      font-size: 0.95rem;
+      color: #fff;
+      opacity: 0.7;
+    }
+    .page-cta footer .support-email a {
+      color: #fff;
+      font-weight: 600;
+      opacity: 0.9;
+      transition: opacity 0.2s;
+    }
+    .page-cta footer .support-email a:hover { opacity: 1; }
+    .page-cta footer .copyright {
+      font-size: 0.8rem;
+      color: #fff;
+      opacity: 0.4;
+      margin-top: 4px;
+    }
+
+    /* LANG TOGGLE */
+    .lang-content { display: none; width: 100%; height: 100%; }
+    .lang-content.active { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; }
+    .page-hero .lang-content.active { justify-content: center; }
+    .page-cta .lang-content.active { justify-content: center; }
+    .page-screenshots .lang-content.active { justify-content: flex-start; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.4rem; }
+      .hero .subtitle { font-size: 1.1rem; }
+      .btn-appstore { padding: 14px 28px; font-size: 1rem; }
+      .btn-appstore .big { font-size: 1.1rem; }
+      .btn-appstore svg { width: 26px; height: 26px; }
+      .mockup-iphone { max-width: 200px; }
+      .page-hero .lang-toggle { top: 12px; right: 12px; }
+      .page-hero .lang-toggle button { padding: 4px 10px; font-size: 11px; }
+      .page-hero .lang-toggle .emoji-flag { font-size: 14px; }
+      .features-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+      .screenshots-row .shot { width: 120px; }
+      .page-description .description-section .desc-text { font-size: 1rem; }
+      .page-cta .cta-section h2 { font-size: 2rem; }
+      .page-cta footer .footer-links { gap: 20px; flex-direction: column; align-items: center; }
+      .scroll-hint { display: none; }
+    }
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.8rem; }
+      .hero .subtitle { font-size: 0.95rem; }
+      .mockup-iphone { max-width: 160px; padding: 8px; border-radius: 32px; }
+      .mockup-iphone .screen { border-radius: 24px; padding: 16px; }
+      .mockup-iphone .screen .app-icon-placeholder { font-size: 36px; }
+      .mockup-iphone .screen .app-name { font-size: 0.9rem; }
+      .mockup-iphone .notch { width: 80px; height: 20px; top: 8px; }
+      .features-grid { grid-template-columns: 1fr; gap: 12px; }
+      .screenshots-row .shot { width: 100px; }
+      .page-features .features h2 { font-size: 1.6rem; }
+      .page-description .description-section .desc-text { font-size: 0.9rem; }
+      .btn-appstore { padding: 12px 20px; font-size: 0.9rem; }
+      .btn-appstore .big { font-size: 1rem; }
+      .btn-appstore svg { width: 22px; height: 22px; }
+      .feature-card { padding: 20px 16px; }
+      .feature-card .icon { font-size: 2.2rem; }
+      .faq-item .q { font-size: 1rem; }
+      .page-cta .cta-section h2 { font-size: 1.6rem; }
+      .page { padding: 20px 0; }
+      .page-screenshots .screenshots-section { padding: 10px 0; }
+      .page-screenshots .screenshots-section h2 { font-size: 1.6rem; }
+    }
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.3); }
+    ::selection { background: rgba(255,107,0,0.3); color: #1a1a1a; }
+    .page-features ::selection, .page-description ::selection, .page-faq ::selection { background: rgba(255,107,0,0.2); }
+  </style>
+</head>
+<body>
+
+<!-- ===== PAGE 1: HERO (ORANGE) ===== -->
+<section class="page page-hero" id="page-hero">
+  <div class="lang-toggle" id="langToggle">
+    <button data-lang="en" class="active"><span class="emoji-flag">🇺🇸</span> EN</button>
+    <button data-lang="ru"><span class="emoji-flag">🇷🇺</span> RU</button>
+    <button data-lang="fr"><span class="emoji-flag">🇫🇷</span> FR</button>
+    <button data-lang="pt"><span class="emoji-flag">🇵🇹</span> PT</button>
+    <button data-lang="es"><span class="emoji-flag">🇪🇸</span> ES</button>
+    <button data-lang="zh"><span class="emoji-flag">🇨🇳</span> ZH</button>
+  </div>
+  <div class="page-content">
+    <!-- EN -->
+    <div id="lang-en" class="lang-content active">
+      <section class="hero">
+        <div class="hero-content">
+          <h1>Ucents <span class="highlight">Budget & Expenses</span></h1>
+          <p class="subtitle">Track your net worth, assets, liabilities and cash flow with ease. Smart financial dashboard.</p>
+          <div class="cta-wrapper">
+            <a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore">
+              <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+              <span><span class="small">Download on the</span><span class="big">App Store</span></span>
+            </a>
+          </div>
+        </div>
+        <div class="mockup-wrapper">
+          <div class="mockup-iphone">
+            <div class="notch"></div>
+            <div class="screen">
+              <div class="app-icon-placeholder">💰</div>
+              <div class="app-name">Ucents</div>
+              <div class="app-sub">Net worth • $42,800</div>
+              <div class="financial-badge">+12% this month</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <!-- RU, FR, PT, ES, ZH (simplified) – same structure, only text differs -->
+    <div id="lang-ru" class="lang-content"><section class="hero"><div class="hero-content"><h1>Ucents <span class="highlight">Бюджет и расходы</span></h1><p class="subtitle">Отслеживайте чистый капитал, активы, обязательства и денежный поток. Умный финансовый дашборд.</p><div class="cta-wrapper"><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">Загрузить в</span><span class="big">App Store</span></span></a></div></div><div class="mockup-wrapper"><div class="mockup-iphone"><div class="notch"></div><div class="screen"><div class="app-icon-placeholder">💰</div><div class="app-name">Ucents</div><div class="app-sub">Чистый капитал • $42,800</div><div class="financial-badge">+12% за месяц</div></div></div></div></section></div>
+    <div id="lang-fr" class="lang-content"><section class="hero"><div class="hero-content"><h1>Ucents <span class="highlight">Budget et dépenses</span></h1><p class="subtitle">Suivez votre patrimoine net, actifs, passifs et flux de trésorerie. Tableau de bord financier intelligent.</p><div class="cta-wrapper"><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">Télécharger sur</span><span class="big">App Store</span></span></a></div></div><div class="mockup-wrapper"><div class="mockup-iphone"><div class="notch"></div><div class="screen"><div class="app-icon-placeholder">💰</div><div class="app-name">Ucents</div><div class="app-sub">Patrimoine net • $42,800</div><div class="financial-badge">+12% ce mois</div></div></div></div></section></div>
+    <div id="lang-pt" class="lang-content"><section class="hero"><div class="hero-content"><h1>Ucents <span class="highlight">Orçamento e despesas</span></h1><p class="subtitle">Acompanhe seu patrimônio líquido, ativos, passivos e fluxo de caixa. Painel financeiro inteligente.</p><div class="cta-wrapper"><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">Baixar na</span><span class="big">App Store</span></span></a></div></div><div class="mockup-wrapper"><div class="mockup-iphone"><div class="notch"></div><div class="screen"><div class="app-icon-placeholder">💰</div><div class="app-name">Ucents</div><div class="app-sub">Patrimônio • $42,800</div><div class="financial-badge">+12% este mês</div></div></div></div></section></div>
+    <div id="lang-es" class="lang-content"><section class="hero"><div class="hero-content"><h1>Ucents <span class="highlight">Presupuesto y gastos</span></h1><p class="subtitle">Sigue tu patrimonio neto, activos, pasivos y flujo de efectivo. Panel financiero inteligente.</p><div class="cta-wrapper"><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">Descargar en</span><span class="big">App Store</span></span></a></div></div><div class="mockup-wrapper"><div class="mockup-iphone"><div class="notch"></div><div class="screen"><div class="app-icon-placeholder">💰</div><div class="app-name">Ucents</div><div class="app-sub">Patrimonio • $42,800</div><div class="financial-badge">+12% este mes</div></div></div></div></section></div>
+    <div id="lang-zh" class="lang-content"><section class="hero"><div class="hero-content"><h1>Ucents <span class="highlight">预算与支出</span></h1><p class="subtitle">轻松追踪您的净资产、资产、负债和现金流。智能财务仪表板。</p><div class="cta-wrapper"><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">在 App Store 上</span><span class="big">下载</span></span></a></div></div><div class="mockup-wrapper"><div class="mockup-iphone"><div class="notch"></div><div class="screen"><div class="app-icon-placeholder">💰</div><div class="app-name">Ucents</div><div class="app-sub">净资产 • $42,800</div><div class="financial-badge">本月 +12%</div></div></div></div></section></div>
+  </div>
+  <div class="scroll-hint"><span class="arrow">↓</span><span>Scroll</span></div>
+</section>
+
+<!-- ===== PAGE 2: FEATURES (WHITE) ===== -->
+<section class="page page-features" id="page-features">
+  <div class="page-content">
+    <div id="lang-en" class="lang-content active">
+      <section class="features">
+        <h2>Smart financial tools</h2>
+        <p class="section-desc">Understand your net worth, liquidity, and investment portfolio at a glance.</p>
+        <div class="features-grid">
+          <div class="feature-card"><span class="icon">📊</span><h3>Net Worth</h3><p>Track assets minus liabilities. See your true financial health.</p></div>
+          <div class="feature-card"><span class="icon">💳</span><h3>Assets & Liabilities</h3><p>Manage all your property, debts, and credit lines in one place.</p></div>
+          <div class="feature-card"><span class="icon">💧</span><h3>Liquidity</h3><p>Know how quickly you can access cash when you need it.</p></div>
+          <div class="feature-card"><span class="icon">📈</span><h3>Investment Portfolio</h3><p>Stocks, bonds, crypto – see your entire portfolio performance.</p></div>
+          <div class="feature-card"><span class="icon">🏦</span><h3>Passive Income</h3><p>Track dividends, rental income, and interest effortlessly.</p></div>
+          <div class="feature-card"><span class="icon">🧾</span><h3>Accounts Receivable</h3><p>Monitor money owed to you and manage cash flow.</p></div>
+        </div>
+      </section>
+    </div>
+    <!-- other langs simplified for brevity – same grid -->
+    <div id="lang-ru" class="lang-content"><section class="features"><h2>Умные финансовые инструменты</h2><p class="section-desc">Оценивайте чистый капитал, ликвидность и инвестиционный портфель в один взгляд.</p><div class="features-grid"><div class="feature-card"><span class="icon">📊</span><h3>Чистый капитал</h3><p>Активы минус обязательства. Реальное финансовое здоровье.</p></div><div class="feature-card"><span class="icon">💳</span><h3>Активы и обязательства</h3><p>Управляйте имуществом, долгами и кредитами.</p></div><div class="feature-card"><span class="icon">💧</span><h3>Ликвидность</h3><p>Быстрый доступ к наличным средствам.</p></div><div class="feature-card"><span class="icon">📈</span><h3>Инвестиционный портфель</h3><p>Акции, облигации, криптовалюта.</p></div><div class="feature-card"><span class="icon">🏦</span><h3>Пассивный доход</h3><p>Дивиденды, аренда, проценты.</p></div><div class="feature-card"><span class="icon">🧾</span><h3>Дебиторская задолженность</h3><p>Контроль денег, которые вам должны.</p></div></div></section></div>
+    <div id="lang-fr" class="lang-content"><section class="features"><h2>Outils financiers intelligents</h2><p class="section-desc">Patrimoine net, liquidité, portefeuille d'investissement en un coup d'œil.</p><div class="features-grid"><div class="feature-card"><span class="icon">📊</span><h3>Patrimoine net</h3><p>Actifs moins passifs. Santé financière réelle.</p></div><div class="feature-card"><span class="icon">💳</span><h3>Actifs et passifs</h3><p>Gestion des biens, dettes et crédits.</p></div><div class="feature-card"><span class="icon">💧</span><h3>Liquidité</h3><p>Accès rapide aux liquidités.</p></div><div class="feature-card"><span class="icon">📈</span><h3>Portefeuille</h3><p>Actions, obligations, crypto.</p></div><div class="feature-card"><span class="icon">🏦</span><h3>Revenu passif</h3><p>Dividendes, loyers, intérêts.</p></div><div class="feature-card"><span class="icon">🧾</span><h3>Créances clients</h3><p>Suivi des sommes dues.</p></div></div></section></div>
+    <div id="lang-pt" class="lang-content"><section class="features"><h2>Ferramentas financeiras inteligentes</h2><p class="section-desc">Patrimônio líquido, liquidez e carteira de investimentos.</p><div class="features-grid"><div class="feature-card"><span class="icon">📊</span><h3>Patrimônio líquido</h3><p>Ativos menos passivos.</p></div><div class="feature-card"><span class="icon">💳</span><h3>Ativos e passivos</h3><p>Bens, dívidas e créditos.</p></div><div class="feature-card"><span class="icon">💧</span><h3>Liquidez</h3><p>Acesso rápido ao caixa.</p></div><div class="feature-card"><span class="icon">📈</span><h3>Carteira</h3><p>Ações, títulos, cripto.</p></div><div class="feature-card"><span class="icon">🏦</span><h3>Renda passiva</h3><p>Dividendos, aluguéis.</p></div><div class="feature-card"><span class="icon">🧾</span><h3>Contas a receber</h3><p>Valores a receber.</p></div></div></section></div>
+    <div id="lang-es" class="lang-content"><section class="features"><h2>Herramientas financieras</h2><p class="section-desc">Patrimonio neto, liquidez y cartera de inversiones.</p><div class="features-grid"><div class="feature-card"><span class="icon">📊</span><h3>Patrimonio neto</h3><p>Activos menos pasivos.</p></div><div class="feature-card"><span class="icon">💳</span><h3>Activos y pasivos</h3><p>Bienes, deudas y créditos.</p></div><div class="feature-card"><span class="icon">💧</span><h3>Liquidez</h3><p>Acceso rápido al efectivo.</p></div><div class="feature-card"><span class="icon">📈</span><h3>Cartera</h3><p>Acciones, bonos, cripto.</p></div><div class="feature-card"><span class="icon">🏦</span><h3>Ingreso pasivo</h3><p>Dividendos, alquileres.</p></div><div class="feature-card"><span class="icon">🧾</span><h3>Cuentas por cobrar</h3><p>Dinero que te deben.</p></div></div></section></div>
+    <div id="lang-zh" class="lang-content"><section class="features"><h2>智能财务工具</h2><p class="section-desc">净资产、流动性和投资组合一目了然。</p><div class="features-grid"><div class="feature-card"><span class="icon">📊</span><h3>净资产</h3><p>资产减负债。真实财务状况。</p></div><div class="feature-card"><span class="icon">💳</span><h3>资产与负债</h3><p>管理财产、债务和信贷。</p></div><div class="feature-card"><span class="icon">💧</span><h3>流动性</h3><p>快速获取现金。</p></div><div class="feature-card"><span class="icon">📈</span><h3>投资组合</h3><p>股票、债券、加密货币。</p></div><div class="feature-card"><span class="icon">🏦</span><h3>被动收入</h3><p>股息、租金、利息。</p></div><div class="feature-card"><span class="icon">🧾</span><h3>应收账款</h3><p>追踪应收款项。</p></div></div></section></div>
+  </div>
+</section>
+
+<!-- ===== PAGE 3: DESCRIPTION (WHITE) ===== -->
+<section class="page page-description" id="page-description">
+  <div class="page-content">
+    <div id="lang-en" class="lang-content active">
+      <section class="description-section">
+        <div class="desc-text">
+          <strong>Ucents – Budget & Expenses</strong> gives you a complete picture of your financial life. Track your net worth, assets, liabilities, liquidity, and investment portfolio in one sleek dashboard. Whether you're managing personal finances or running a small business, Ucents helps you make smarter decisions.<br><br>
+          <strong>Key features:</strong> Real-time net worth calculation, detailed asset and liability tracking, liquidity indicators, investment portfolio monitoring, passive income tracking, accounts receivable and payable management, depreciation tracking, solvency ratios, and much more. All data is presented in clear charts and summaries.<br><br>
+          Available on the App Store. Free core features with premium options for advanced analytics and sync.
+        </div>
+      </section>
+    </div>
+    <div id="lang-ru" class="lang-content"><section class="description-section"><div class="desc-text"><strong>Ucents – Бюджет и расходы</strong> даёт полную картину ваших финансов. Отслеживайте чистый капитал, активы, обязательства, ликвидность и инвестиционный портфель в одном элегантном дашборде. Управляйте личными финансами или малым бизнесом – Ucents поможет принимать верные решения.<br><br><strong>Возможности:</strong> расчёт чистого капитала, учёт активов и обязательств, индикаторы ликвидности, мониторинг портфеля, пассивный доход, дебиторская и кредиторская задолженность, амортизация, коэффициенты платежеспособности. Все данные в понятных графиках.<br><br>Доступно в App Store. Базовые функции бесплатны, премиум – расширенная аналитика и синхронизация.</div></section></div>
+    <div id="lang-fr" class="lang-content"><section class="description-section"><div class="desc-text"><strong>Ucents – Budget et dépenses</strong> vous offre une vue complète de votre vie financière. Suivez votre patrimoine net, actifs, passifs, liquidités et portefeuille d'investissement. Gérez vos finances personnelles ou votre petite entreprise.<br><br><strong>Fonctionnalités :</strong> calcul du patrimoine net, suivi des actifs et passifs, indicateurs de liquidité, portefeuille, revenu passif, comptes clients et fournisseurs, amortissement, ratios de solvabilité. Graphiques clairs.<br><br>Disponible sur l'App Store. Fonctions de base gratuites, premium pour analyses avancées.</div></section></div>
+    <div id="lang-pt" class="lang-content"><section class="description-section"><div class="desc-text"><strong>Ucents – Orçamento e despesas</strong> oferece uma visão completa da sua vida financeira. Acompanhe patrimônio líquido, ativos, passivos, liquidez e carteira de investimentos. Gerencie finanças pessoais ou pequenos negócios.<br><br><strong>Recursos:</strong> cálculo de patrimônio, ativos e passivos, indicadores de liquidez, carteira, renda passiva, contas a receber e a pagar, depreciação, índices de solvência. Gráficos claros.<br><br>Disponível na App Store. Funções básicas gratuitas, premium para análises avançadas.</div></section></div>
+    <div id="lang-es" class="lang-content"><section class="description-section"><div class="desc-text"><strong>Ucents – Presupuesto y gastos</strong> te da una imagen completa de tus finanzas. Sigue patrimonio neto, activos, pasivos, liquidez y cartera de inversiones. Gestiona finanzas personales o pequeñas empresas.<br><br><strong>Características:</strong> cálculo de patrimonio, activos y pasivos, indicadores de liquidez, cartera, ingresos pasivos, cuentas por cobrar y pagar, depreciación, ratios de solvencia. Gráficos claros.<br><br>Disponible en App Store. Funciones básicas gratuitas, premium para análisis avanzados.</div></section></div>
+    <div id="lang-zh" class="lang-content"><section class="description-section"><div class="desc-text"><strong>Ucents – 预算与支出</strong> 让您全面了解财务状况。追踪净资产、资产、负债、流动性和投资组合。管理个人财务或小型企业。<br><br><strong>功能：</strong> 净资产计算，资产与负债跟踪，流动性指标，投资组合监控，被动收入，应收账款和应付账款，折旧，偿付能力比率。清晰的图表。<br><br>可在 App Store 获取。基础功能免费，高级版提供高级分析和同步。</div></section></div>
+  </div>
+</section>
+
+<!-- ===== PAGE 4: SCREENSHOTS (FFEBDD) ===== -->
+<section class="page page-screenshots" id="page-screenshots">
+  <div class="page-content">
+    <div id="lang-en" class="lang-content active">
+      <section class="screenshots-section">
+        <h2>See it in action</h2>
+        <p class="section-desc">Screenshots from the app – your finances at a glance.</p>
+        <div class="screenshots-row">
+          <div class="shot"><img src="iphone_1.jpg" alt="Screenshot 1" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div>
+          <div class="shot"><img src="iphone_2.jpg" alt="Screenshot 2" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div>
+          <div class="shot"><img src="iphone_3.jpg" alt="Screenshot 3" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div>
+          <div class="shot"><img src="iphone_4.jpg" alt="Screenshot 4" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div>
+          <div class="shot"><img src="iphone_5.jpg" alt="Screenshot 5" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div>
+          <div class="shot"><img src="iphone_6.jpg" alt="Screenshot 6" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div>
+          <div class="shot"><img src="iphone_7.jpg" alt="Screenshot 7" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div>
+          <div class="shot"><img src="iphone_8.jpg" alt="Screenshot 8" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div>
+          <div class="shot"><img src="iphone_9.jpg" alt="Screenshot 9" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div>
+        </div>
+      </section>
+    </div>
+    <!-- other langs same screenshots -->
+    <div id="lang-ru" class="lang-content"><section class="screenshots-section"><h2>Как это работает</h2><p class="section-desc">Скриншоты из приложения – ваши финансы наглядно.</p><div class="screenshots-row"><div class="shot"><img src="iphone_1.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_2.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_3.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_4.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_5.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_6.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_7.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_8.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_9.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div></div></section></div>
+    <!-- fr, pt, es, zh – same, just duplicate with language-specific heading -->
+    <div id="lang-fr" class="lang-content"><section class="screenshots-section"><h2>En action</h2><p class="section-desc">Captures d'écran de l'application.</p><div class="screenshots-row"><div class="shot"><img src="iphone_1.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_2.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_3.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_4.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_5.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_6.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_7.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_8.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_9.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div></div></section></div>
+    <div id="lang-pt" class="lang-content"><section class="screenshots-section"><h2>Veja na prática</h2><p class="section-desc">Capturas de tela do app.</p><div class="screenshots-row"><div class="shot"><img src="iphone_1.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_2.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_3.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_4.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_5.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_6.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_7.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_8.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_9.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div></div></section></div>
+    <div id="lang-es" class="lang-content"><section class="screenshots-section"><h2>En acción</h2><p class="section-desc">Capturas de pantalla de la app.</p><div class="screenshots-row"><div class="shot"><img src="iphone_1.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_2.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_3.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_4.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_5.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_6.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_7.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_8.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_9.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div></div></section></div>
+    <div id="lang-zh" class="lang-content"><section class="screenshots-section"><h2>实际预览</h2><p class="section-desc">应用截图 – 财务一目了然。</p><div class="screenshots-row"><div class="shot"><img src="iphone_1.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_2.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_3.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_4.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_5.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_6.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_7.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_8.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div><div class="shot"><img src="iphone_9.jpg" onerror="this.style.display='none';"><div class="placeholder" style="display:none;">📱</div></div></div></section></div>
+  </div>
+</section>
+
+<!-- ===== PAGE 5: FAQ (WHITE) ===== -->
+<section class="page page-faq" id="page-faq">
+  <div class="page-content">
+    <div id="lang-en" class="lang-content active">
+      <section class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item"><div class="q">What is net worth?</div><div class="a">Net worth (or net value) is the real financial value owned by a person or business. It is calculated as the difference between all assets (things that have monetary value and belong to you) and all liabilities (debts and loans).</div></div>
+        <div class="faq-item"><div class="q">What are Assets?</div><div class="a">Assets are all property and resources owned by you or a company that have monetary value and can bring economic benefit in the future (e.g., real estate, stocks, cash in accounts).</div></div>
+        <div class="faq-item"><div class="q">What are Liabilities?</div><div class="a">Liabilities are any financial debts, obligations, and loans that you or a business must pay to other persons or organizations (e.g., mortgage, credit card debt).</div></div>
+        <div class="faq-item"><div class="q">What is Liquidity?</div><div class="a">Liquidity is the ability of assets to be quickly converted into cash without significant loss of value (e.g., money on a card is highly liquid, while an apartment is low-liquidity).</div></div>
+        <div class="faq-item"><div class="q">What is Equity?</div><div class="a">Equity is the owners' share in a company's assets after deducting all liabilities. For individuals, it is the share of net asset value (e.g., market price of a house minus the remaining mortgage).</div></div>
+        <div class="faq-item"><div class="q">What is Accounts Receivable?</div><div class="a">Accounts Receivable is the amount of money that clients, contractors, or other parties owe you or your business for goods and services already provided.</div></div>
+        <div class="faq-item"><div class="q">What is Accounts Payable?</div><div class="a">Accounts Payable is the amount of debt that you or your business must pay to suppliers, contractors, or partners for goods or services already received.</div></div>
+        <div class="faq-item"><div class="q">What is Depreciation?</div><div class="a">Depreciation is the gradual decrease in the value of tangible assets (cars, equipment, machinery) over time due to physical wear or technological obsolescence.</div></div>
+        <div class="faq-item"><div class="q">What is Solvency?</div><div class="a">Solvency is the ability of a person or business to meet its long-term financial obligations in a timely and full manner.</div></div>
+        <div class="faq-item"><div class="q">What is an Investment Portfolio?</div><div class="a">An Investment Portfolio is a collection of all financial assets (stocks, bonds, cryptocurrency, gold) brought together to preserve and grow capital.</div></div>
+        <div class="faq-item"><div class="q">What is Passive Income?</div><div class="a">Passive Income is a regular cash flow that comes to you without the need for active daily participation (e.g., dividends on stocks, interest on deposits, or rental income from real estate).</div></div>
+      </section>
+    </div>
+    <!-- RU, FR, PT, ES, ZH – using same structure, translated content -->
+    <div id="lang-ru" class="lang-content"><section class="faq-section"><h2>Часто задаваемые вопросы</h2>
+      <div class="faq-item"><div class="q">Что такое чистый капитал?</div><div class="a">Чистый капитал (или чистая стоимость) — это реальная финансовая стоимость, которой владеет человек или бизнес. Рассчитывается как разница между всеми активами и всеми обязательствами.</div></div>
+      <div class="faq-item"><div class="q">Что такое активы?</div><div class="a">Активы — все имущество и ресурсы, имеющие денежную стоимость и способные принести экономическую выгоду (недвижимость, акции, деньги на счетах).</div></div>
+      <div class="faq-item"><div class="q">Что такое обязательства?</div><div class="a">Обязательства — любые финансовые долги, кредиты, которые вы должны выплатить другим лицам (ипотека, долг по карте).</div></div>
+      <div class="faq-item"><div class="q">Что такое ликвидность?</div><div class="a">Ликвидность — способность активов быстро превращаться в наличные без существенной потери стоимости (деньги на карте — высоколиквидны, квартира — низколиквидна).</div></div>
+      <div class="faq-item"><div class="q">Что такое собственный капитал?</div><div class="a">Собственный капитал — доля владельцев в активах компании после вычета обязательств. Для физлиц — доля чистой стоимости имущества (цена дома минус остаток по ипотеке).</div></div>
+      <div class="faq-item"><div class="q">Что такое дебиторская задолженность?</div><div class="a">Дебиторская задолженность — сумма, которую клиенты, контрагенты должны вам за уже предоставленные товары и услуги.</div></div>
+      <div class="faq-item"><div class="q">Что такое кредиторская задолженность?</div><div class="a">Кредиторская задолженность — сумма долга, которую вы должны выплатить поставщикам, подрядчикам за полученные товары или услуги.</div></div>
+      <div class="faq-item"><div class="q">Что такое амортизация?</div><div class="a">Амортизация — постепенное снижение стоимости материальных активов (автомобилей, оборудования) из-за износа или морального устаревания.</div></div>
+      <div class="faq-item"><div class="q">Что такое платежеспособность?</div><div class="a">Платежеспособность — способность своевременно и в полном объеме выполнять долгосрочные финансовые обязательства.</div></div>
+      <div class="faq-item"><div class="q">Что такое инвестиционный портфель?</div><div class="a">Инвестиционный портфель — совокупность финансовых активов (акции, облигации, криптовалюта, золото) для сохранения и приумножения капитала.</div></div>
+      <div class="faq-item"><div class="q">Что такое пассивный доход?</div><div class="a">Пассивный доход — регулярный денежный поток без активного ежедневного участия (дивиденды, проценты по вкладам, доход от аренды).</div></div>
+    </section></div>
+    <!-- fr -->
+    <div id="lang-fr" class="lang-content"><section class="faq-section"><h2>Questions fréquentes</h2>
+      <div class="faq-item"><div class="q">Qu'est-ce que le patrimoine net ?</div><div class="a">Le patrimoine net est la valeur financière réelle détenue par une personne ou une entreprise. Il est calculé comme la différence entre tous les actifs et tous les passifs.</div></div>
+      <div class="faq-item"><div class="q">Que sont les actifs ?</div><div class="a">Les actifs sont tous les biens et ressources ayant une valeur monétaire et pouvant apporter un avantage économique futur (immobilier, actions, liquidités).</div></div>
+      <div class="faq-item"><div class="q">Que sont les passifs ?</div><div class="a">Les passifs sont toutes les dettes financières, obligations et emprunts que vous devez rembourser (hypothèque, dette de carte de crédit).</div></div>
+      <div class="faq-item"><div class="q">Qu'est-ce que la liquidité ?</div><div class="a">La liquidité est la capacité des actifs à être convertis rapidement en espèces sans perte de valeur significative.</div></div>
+      <div class="faq-item"><div class="q">Qu'est-ce que les capitaux propres ?</div><div class="a">Les capitaux propres sont la part des propriétaires dans les actifs d'une entreprise après déduction de tous les passifs. Pour les particuliers, c'est la part de la valeur nette des biens.</div></div>
+      <div class="faq-item"><div class="q">Qu'est-ce que les comptes clients ?</div><div class="a">Les comptes clients sont les sommes que les clients vous doivent pour des biens ou services déjà fournis.</div></div>
+      <div class="faq-item"><div class="q">Qu'est-ce que les comptes fournisseurs ?</div><div class="a">Les comptes fournisseurs sont les dettes que vous devez payer aux fournisseurs pour des biens ou services reçus.</div></div>
+      <div class="faq-item"><div class="q">Qu'est-ce que l'amortissement ?</div><div class="a">L'amortissement est la diminution progressive de la valeur des actifs corporels (voitures, équipements) en raison de l'usure ou de l'obsolescence.</div></div>
+      <div class="faq-item"><div class="q">Qu'est-ce que la solvabilité ?</div><div class="a">La solvabilité est la capacité d'une personne ou d'une entreprise à honorer ses obligations financières à long terme.</div></div>
+      <div class="faq-item"><div class="q">Qu'est-ce qu'un portefeuille d'investissement ?</div><div class="a">Un portefeuille d'investissement est un ensemble d'actifs financiers (actions, obligations, crypto, or) pour préserver et accroître le capital.</div></div>
+      <div class="faq-item"><div class="q">Qu'est-ce que le revenu passif ?</div><div class="a">Le revenu passif est un flux de trésorerie régulier sans participation active quotidienne (dividendes, intérêts, loyers).</div></div>
+    </section></div>
+    <!-- pt -->
+    <div id="lang-pt" class="lang-content"><section class="faq-section"><h2>Perguntas frequentes</h2>
+      <div class="faq-item"><div class="q">O que é patrimônio líquido?</div><div class="a">Patrimônio líquido é o valor financeiro real de uma pessoa ou empresa. Calculado como a diferença entre todos os ativos e todos os passivos.</div></div>
+      <div class="faq-item"><div class="q">O que são ativos?</div><div class="a">Ativos são todos os bens e recursos com valor monetário que podem trazer benefício econômico futuro (imóveis, ações, dinheiro em conta).</div></div>
+      <div class="faq-item"><div class="q">O que são passivos?</div><div class="a">Passivos são todas as dívidas financeiras e obrigações que você deve pagar (hipoteca, dívida de cartão de crédito).</div></div>
+      <div class="faq-item"><div class="q">O que é liquidez?</div><div class="a">Liquidez é a capacidade dos ativos de serem rapidamente convertidos em dinheiro sem perda significativa de valor.</div></div>
+      <div class="faq-item"><div class="q">O que é capital próprio?</div><div class="a">Capital próprio é a participação dos proprietários nos ativos de uma empresa após dedução dos passivos. Para pessoas físicas, é a parcela do patrimônio líquido.</div></div>
+      <div class="faq-item"><div class="q">O que é contas a receber?</div><div class="a">Contas a receber é o valor que clientes ou terceiros devem a você por bens ou serviços já fornecidos.</div></div>
+      <div class="faq-item"><div class="q">O que é contas a pagar?</div><div class="a">Contas a pagar é a dívida que você deve pagar a fornecedores por bens ou serviços recebidos.</div></div>
+      <div class="faq-item"><div class="q">O que é depreciação?</div><div class="a">Depreciação é a diminuição gradual do valor de ativos tangíveis (carros, equipamentos) devido ao desgaste ou obsolescência.</div></div>
+      <div class="faq-item"><div class="q">O que é solvência?</div><div class="a">Solvência é a capacidade de cumprir obrigações financeiras de longo prazo em dia e na íntegra.</div></div>
+      <div class="faq-item"><div class="q">O que é carteira de investimentos?</div><div class="a">Carteira de investimentos é o conjunto de ativos financeiros (ações, títulos, cripto, ouro) para preservar e aumentar o capital.</div></div>
+      <div class="faq-item"><div class="q">O que é renda passiva?</div><div class="a">Renda passiva é um fluxo de caixa regular sem participação ativa diária (dividendos, juros, aluguéis).</div></div>
+    </section></div>
+    <!-- es -->
+    <div id="lang-es" class="lang-content"><section class="faq-section"><h2>Preguntas frecuentes</h2>
+      <div class="faq-item"><div class="q">¿Qué es el patrimonio neto?</div><div class="a">El patrimonio neto es el valor financiero real de una persona o empresa. Se calcula como la diferencia entre todos los activos y todos los pasivos.</div></div>
+      <div class="faq-item"><div class="q">¿Qué son los activos?</div><div class="a">Los activos son todos los bienes y recursos con valor monetario que pueden generar beneficio económico futuro (inmuebles, acciones, dinero en cuentas).</div></div>
+      <div class="faq-item"><div class="q">¿Qué son los pasivos?</div><div class="a">Los pasivos son todas las deudas financieras y obligaciones que debe pagar (hipoteca, deuda de tarjeta de crédito).</div></div>
+      <div class="faq-item"><div class="q">¿Qué es la liquidez?</div><div class="a">La liquidez es la capacidad de los activos para convertirse rápidamente en efectivo sin pérdida significativa de valor.</div></div>
+      <div class="faq-item"><div class="q">¿Qué es el capital propio?</div><div class="a">El capital propio es la participación de los propietarios en los activos de una empresa después de deducir los pasivos. Para particulares, es la parte del patrimonio neto.</div></div>
+      <div class="faq-item"><div class="q">¿Qué es cuentas por cobrar?</div><div class="a">Cuentas por cobrar es el monto que los clientes le deben por bienes o servicios ya proporcionados.</div></div>
+      <div class="faq-item"><div class="q">¿Qué es cuentas por pagar?</div><div class="a">Cuentas por pagar es la deuda que debe pagar a proveedores por bienes o servicios recibidos.</div></div>
+      <div class="faq-item"><div class="q">¿Qué es depreciación?</div><div class="a">La depreciación es la disminución gradual del valor de los activos tangibles (autos, equipos) debido al desgaste u obsolescencia.</div></div>
+      <div class="faq-item"><div class="q">¿Qué es solvencia?</div><div class="a">Solvencia es la capacidad de cumplir con las obligaciones financieras a largo plazo de manera oportuna y completa.</div></div>
+      <div class="faq-item"><div class="q">¿Qué es cartera de inversiones?</div><div class="a">Cartera de inversiones es el conjunto de activos financieros (acciones, bonos, cripto, oro) para preservar y aumentar el capital.</div></div>
+      <div class="faq-item"><div class="q">¿Qué es ingreso pasivo?</div><div class="a">El ingreso pasivo es un flujo de efectivo regular sin participación activa diaria (dividendos, intereses, alquileres).</div></div>
+    </section></div>
+    <!-- zh -->
+    <div id="lang-zh" class="lang-content"><section class="faq-section"><h2>常见问题</h2>
+      <div class="faq-item"><div class="q">什么是净资产？</div><div class="a">净资产是个人或企业拥有的实际财务价值。计算方式为所有资产减去所有负债。</div></div>
+      <div class="faq-item"><div class="q">什么是资产？</div><div class="a">资产是您或公司拥有的所有具有货币价值并能带来未来经济利益的财产和资源（如房地产、股票、存款）。</div></div>
+      <div class="faq-item"><div class="q">什么是负债？</div><div class="a">负债是您或企业必须偿还给其他人的任何财务债务、义务和贷款（如抵押贷款、信用卡债务）。</div></div>
+      <div class="faq-item"><div class="q">什么是流动性？</div><div class="a">流动性是资产在不显著损失价值的情况下快速转换为现金的能力（如卡内资金流动性高，而房产流动性低）。</div></div>
+      <div class="faq-item"><div class="q">什么是所有者权益？</div><div class="a">所有者权益是扣除所有负债后公司资产中所有者的份额。对于个人，相当于净资产份额（如房屋市价减去剩余抵押贷款）。</div></div>
+      <div class="faq-item"><div class="q">什么是应收账款？</div><div class="a">应收账款是客户、承包商或其他方因已提供的商品和服务而欠您或您企业的金额。</div></div>
+      <div class="faq-item"><div class="q">什么是应付账款？</div><div class="a">应付账款是您或您的企业因已收到的商品或服务而必须支付给供应商、承包商或合作伙伴的债务金额。</div></div>
+      <div class="faq-item"><div class="q">什么是折旧？</div><div class="a">折旧是有形资产（汽车、设备、机械）由于物理磨损或技术过时而随时间逐渐减少的价值。</div></div>
+      <div class="faq-item"><div class="q">什么是偿付能力？</div><div class="a">偿付能力是个人或企业及时、全额履行其长期财务义务的能力。</div></div>
+      <div class="faq-item"><div class="q">什么是投资组合？</div><div class="a">投资组合是为保值和增值资本而汇集的所有金融资产（股票、债券、加密货币、黄金）的集合。</div></div>
+      <div class="faq-item"><div class="q">什么是被动收入？</div><div class="a">被动收入是无需日常主动参与即可获得的定期现金流（如股票股息、存款利息或房地产租金收入）。</div></div>
+    </section></div>
+  </div>
+</section>
+
+<!-- ===== PAGE 6: CTA + FOOTER (ORANGE) ===== -->
+<section class="page page-cta" id="page-cta">
+  <div class="page-content">
+    <div id="lang-en" class="lang-content active">
+      <section class="cta-section">
+        <h2>Ready to take control?</h2>
+        <p class="sub">Download Ucents today and start tracking your financial future with confidence.</p>
+        <a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore" style="background:#000; color:#fff;">
+          <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          <span><span class="small">Download on the</span><span class="big">App Store</span></span>
+        </a>
+      </section>
+    </div>
+    <div id="lang-ru" class="lang-content"><section class="cta-section"><h2>Готовы взять под контроль?</h2><p class="sub">Скачайте Ucents сегодня и начните отслеживать своё финансовое будущее с уверенностью.</p><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore" style="background:#000; color:#fff;"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">Загрузить в</span><span class="big">App Store</span></span></a></section></div>
+    <div id="lang-fr" class="lang-content"><section class="cta-section"><h2>Prêt à prendre le contrôle ?</h2><p class="sub">Téléchargez Ucents aujourd'hui et suivez votre avenir financier en toute confiance.</p><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore" style="background:#000; color:#fff;"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">Télécharger sur</span><span class="big">App Store</span></span></a></section></div>
+    <div id="lang-pt" class="lang-content"><section class="cta-section"><h2>Pronto para assumir o controle?</h2><p class="sub">Baixe o Ucents hoje e comece a acompanhar seu futuro financeiro com confiança.</p><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore" style="background:#000; color:#fff;"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">Baixar na</span><span class="big">App Store</span></span></a></section></div>
+    <div id="lang-es" class="lang-content"><section class="cta-section"><h2>¿Listo para tomar el control?</h2><p class="sub">Descarga Ucents hoy y comienza a seguir tu futuro financiero con confianza.</p><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore" style="background:#000; color:#fff;"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">Descargar en</span><span class="big">App Store</span></span></a></section></div>
+    <div id="lang-zh" class="lang-content"><section class="cta-section"><h2>准备好掌控了吗？</h2><p class="sub">立即下载 Ucents，自信地追踪您的财务未来。</p><a href="https://apps.apple.com/us/app/ucents-budget-expenses/id6783916632" target="_blank" rel="noopener noreferrer" class="btn-appstore" style="background:#000; color:#fff;"><svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg><span><span class="small">在 App Store 上</span><span class="big">下载</span></span></a></section></div>
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-links">
+          <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+          <a href="https://appstorch.github.io/privacy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+        </div>
+        <div class="support-email">Support: <a href="mailto:golt.apps@gmail.com">golt.apps@gmail.com</a></div>
+        <div class="copyright">&copy; 2025 Ucents. All rights reserved.</div>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<!-- LANGUAGE SWITCHER SCRIPT -->
+<script>
+  (function(){
+    const langs = ['en','ru','fr','pt','es','zh'];
+    const langContents = {};
+    document.querySelectorAll('.lang-content').forEach(el => {
+      const id = el.id;
+      if (id) {
+        const lang = id.replace('lang-','');
+        if (langs.includes(lang)) {
+          if (!langContents[lang]) langContents[lang] = [];
+          langContents[lang].push(el);
+        }
+      }
+    });
+    const buttons = document.querySelectorAll('#langToggle button');
+    function switchLang(lang) {
+      Object.keys(langContents).forEach(key => {
+        langContents[key].forEach(el => el.classList.remove('active'));
+      });
+      if (langContents[lang]) langContents[lang].forEach(el => el.classList.add('active'));
+      else if (langContents['en']) langContents['en'].forEach(el => el.classList.add('active'));
+      buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.lang === lang) btn.classList.add('active');
+      });
+      try { localStorage.setItem('ucents-lang', lang); } catch(e) {}
+      document.documentElement.lang = lang;
+    }
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const lang = this.dataset.lang;
+        if (lang && langContents[lang]) switchLang(lang);
+      });
+    });
+    let defaultLang = 'en';
+    try {
+      const saved = localStorage.getItem('ucents-lang');
+      if (saved && langs.includes(saved)) defaultLang = saved;
+      else {
+        const browserLangs = navigator.languages || [navigator.language || 'en'];
+        for (let bLang of browserLangs) {
+          const base = bLang.split('-')[0].toLowerCase();
+          if (langs.includes(base)) { defaultLang = base; break; }
+        }
+      }
+    } catch(e) {}
+    switchLang(defaultLang);
+  })();
+</script>
+</body>
+</html>
